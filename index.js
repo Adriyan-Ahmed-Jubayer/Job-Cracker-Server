@@ -30,6 +30,17 @@ async function run() {
         const result = await jobsCollection.find().toArray();
         res.send(result);
     })
+    
+    app.get('/api/v1/jobs/:category', async(req, res) => {
+      const jobCategory = req.params.category;
+      const query = {Category: jobCategory };
+      console.log(query);
+      console.log(jobCategory);
+      const result = await jobsCollection.find(query).toArray();
+      console.log(result);
+      res.send(result);
+
+    })
 
     await client.connect();
     await client.db("admin").command({ ping: 1 });
