@@ -49,14 +49,21 @@ async function run() {
 
     app.get("/api/v1/jobs", async (req, res) => {
       let query = {};
-      const AccessToken = req.cookies?.token;
-      console.log(AccessToken);
       if (req.query.category) {
         query = { Category: req.query.category };
       }
       const result = await jobsCollection.find(query).toArray();
       res.send(result);
     });
+
+    app.get('/api/v1/jobs-collection', async(req, res) => {
+      let query = {};
+      if (req.query.title) {
+        query = { Title: req.query.title };
+      }
+      const result = await jobsCollection.find(query).toArray();
+      res.send(result);
+    })
 
     app.post("/jwt", async (req, res) => {
       const user = req.body;
