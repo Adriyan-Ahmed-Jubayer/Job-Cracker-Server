@@ -84,6 +84,13 @@ async function run() {
         .send({ status: true });
     });
 
+    app.post('/api/v1/jobs', async(req, res) => {
+      const Job = req.body;
+      const result = await jobsCollection.insertOne(Job);
+      res.send(result)
+    })
+
+
     await client.connect();
     await client.db("admin").command({ ping: 1 });
     console.log(
