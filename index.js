@@ -4,7 +4,7 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 app.use(
@@ -55,11 +55,17 @@ async function run() {
       const result = await jobsCollection.find(query).toArray();
       res.send(result);
     });
+    app.get("/api/v1/job/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await jobsCollection.findOne(query);
+      res.send(result);
+    });
 
     app.get('/api/v1/jobs-collection', async(req, res) => {
       let query = {};
       if (req.query.title) {
-        query = { Title: req.query.title };
+        query = { Title: {$regex: req.query.title, $options: 'i'} };
       }
       const result = await jobsCollection.find(query).toArray();
       res.send(result);
