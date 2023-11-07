@@ -111,6 +111,17 @@ async function run() {
       res.send(result);
     })
 
+    app.put('/api/v2/job', async(req, res) => {
+      let query = {}
+      let updatedItem = {}
+      if(req.query.id){
+        console.log(req.query.id);
+        query = {_id: new ObjectId(req.query.id)}
+        updatedItem = {$inc: {ApplicantsNumber: 1}}
+      }
+      const result = await jobsCollection.findOneAndUpdate(query, updatedItem )
+      res.send(result)
+    })
 
     await client.connect();
     await client.db("admin").command({ ping: 1 });
