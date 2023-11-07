@@ -81,6 +81,11 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/api/v1/application', async(req, res) => {
+      const result = await appliedJobsCollection.find().toArray();
+      res.send(result)
+    })
+
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCEESS_TOKEN_SECRET, {
