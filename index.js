@@ -46,6 +46,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const jobsCollection = client.db("assignment11DB").collection("jobs");
+    const appliedJobsCollection = client.db("assignment11DB").collection("AppliedJobs");
 
     app.get("/api/v1/jobs", async (req, res) => {
       let query = {};
@@ -97,6 +98,12 @@ async function run() {
       const Job = req.body;
       const result = await jobsCollection.insertOne(Job);
       res.send(result)
+    })
+
+    app.post('/api/v1/application', async(req, res) => {
+      const AppliedJob = req.body;
+      const result = await appliedJobsCollection.insertOne(AppliedJob);
+      res.send(result);
     })
 
 
