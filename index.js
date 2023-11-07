@@ -71,6 +71,15 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/api/v1/collection', async(req, res) => {
+      let query = {};
+      if (req.query.email){
+        query = { PosterEmail: req.query.email };
+      }
+      const result = await jobsCollection.find(query).toArray();
+      res.send(result);
+    })
+
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCEESS_TOKEN_SECRET, {
