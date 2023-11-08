@@ -82,7 +82,17 @@ async function run() {
     })
 
     app.get('/api/v1/application', async(req, res) => {
-      const result = await appliedJobsCollection.find().toArray();
+      const email = req.query.email;
+      let query = {}
+      if(req.query.email){
+        const email = req.query.email;
+        query = {ApplierEmail : email }
+      }
+      if(req.query.category){
+        const category = req.query.category;
+        query = {ApplierEmail : email, Category: category }
+      }
+      const result = await appliedJobsCollection.find(query).toArray();
       res.send(result)
     })
 
