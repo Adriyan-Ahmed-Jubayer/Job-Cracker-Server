@@ -122,10 +122,36 @@ async function run() {
       const result = await jobsCollection.findOneAndUpdate(query, updatedItem )
       res.send(result)
     })
+
+    app.put('/update/:id', async(req, res) => {
+      const id = req.params.id;
+      const job = req.body;
+      const query = {_id: new ObjectId(id)};
+      const option = {upsert: true}
+      const UpdatedJob = {
+        $set: {
+        Company : job.company,
+        companyLogo : job.companyLogo,
+        PosterEmail : job.posterEmail,
+        posterPhoto : job.posterPhoto,
+        Title : job.title,
+        UserName : job.userName,
+        Category : job.category,
+        salaryRange : job.salaryRange,
+        Description : job.description,
+        postDate : job.postDate,
+        Deadline : job.deadline,
+        ApplicantsNumber : job.applicantsNumber,
+        Banner : job.banner
+        }
+      }
+      const result = await jobsCollection.updateOne(query, UpdatedJob, option)
+      res.send(result);
+    })
     
     app.delete('/api/v1/collection/:id', async(req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = {_id: new ObjectId(id)};
       const result = await jobsCollection.deleteOne(query)
       res.send(result)
     })
