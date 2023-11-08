@@ -122,6 +122,13 @@ async function run() {
       const result = await jobsCollection.findOneAndUpdate(query, updatedItem )
       res.send(result)
     })
+    
+    app.delete('/api/v1/collection/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await jobsCollection.deleteOne(query)
+      res.send(result)
+    })
 
     await client.connect();
     await client.db("admin").command({ ping: 1 });
