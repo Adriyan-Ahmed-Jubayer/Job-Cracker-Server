@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
 const jwt = require("jsonwebtoken");
+const app = express();
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["https://job-cracker.web.app", "https://job-cracker.firebaseapp.com", "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -19,7 +19,7 @@ app;
 const verifyToken = (req, res, next) => {
   const token = req.cookies?.accessToken;
   if (!token) {
-    return res.status(401).send("unauthorized access");
+    return res.status(401).send("unauthorized");
   }
   jwt.verify(token, process.env.ACCEESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
@@ -72,17 +72,23 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/api/v1/collection', async(req, res) => {
+    app.get('/api/v1/collection', verifyToken, async(req, res) => {
       let query = {};
       if (req.query.email){
         query = { PosterEmail: req.query.email };
       }
+      if(req?.user?.email !== req.query.email){
+        return res.status(403).send('forbidden Access')
+    }
       const result = await jobsCollection.find(query).toArray();
       res.send(result);
     })
 
-    app.get('/api/v1/application', async(req, res) => {
+    app.get('/api/v1/application', verifyToken , async(req, res) => {
       const email = req.query.email;
+      if(req?.user?.email !== email){
+          return res.status(403).send('forbidden Access')
+      }
       let query = {}
       if(req.query.email){
         const email = req.query.email;
@@ -98,16 +104,21 @@ async function run() {
 
     app.post("/jwt", async (req, res) => {
       const user = req.body;
-      const token = jwt.sign(user, process.env.ACCEESS_TOKEN_SECRET, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(user, process.env.ACCEESS_TOKEN_SECRET, {expiresIn: "1h",});
       res
-        .cookie('accessToken', token, {
-          httpOnly: true,
-          secure: false,
-        })
-        .send({ status: true });
+      .cookie('accessToken', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none"
+      })
+      .send({ status: true , token});
     });
+
+    app.post('/logout', async(req, res) => {
+        const user = req.body;
+        console.log(user);
+        res.clearCookie('accessToken', {maxAge: 0}).send({success: true})
+    })
 
     app.post('/api/v1/jobs', async(req, res) => {
       const Job = req.body;
